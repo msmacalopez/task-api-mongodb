@@ -1,0 +1,35 @@
+GET http://localhost:4000/
+
+###
+POST http://localhost:4000/api/v1/tasks
+Content-Type: application/json
+
+{
+    "task":"sleep",
+    "hour":"23",
+    "type":"bad"
+}
+
+###
+#get all task
+GET http://localhost:4000/api/v1/tasks
+
+###
+#get one task
+GET http://localhost:4000/api/v1/tasks/68cb8a4b640da570f0de43bd
+
+###
+#update the type
+PATCH http://localhost:4000/api/v1/tasks/68cb9037c6d99c1a7a3bd106
+Content-Type: application/json
+
+{
+    "task":"running",
+    "type":"bad"
+}
+
+###
+DELETE http://localhost:4000/api/v1/tasks/68cb9036c6d99c1a7a3bd104
+
+###
+DELETE http://localhost:4000/api/v1/tasks?hour=23
