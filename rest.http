@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
     "task":"sleep",
-    "hour":"23",
+    "hour":"22",
     "type":"bad"
 }
 
@@ -15,21 +15,22 @@ Content-Type: application/json
 GET http://localhost:4000/api/v1/tasks
 
 ###
-#get one task
+#get one task by id (param)
 GET http://localhost:4000/api/v1/tasks/68cb8a4b640da570f0de43bd
 
 ###
-#update the type
+#update the type by id (param)
 PATCH http://localhost:4000/api/v1/tasks/68cb9037c6d99c1a7a3bd106
 Content-Type: application/json
 
 {
-    "task":"running",
-    "type":"bad"
+    "type":"good"
 }
 
 ###
+#delete by id (param)
 DELETE http://localhost:4000/api/v1/tasks/68cb9036c6d99c1a7a3bd104
 
 ###
-DELETE http://localhost:4000/api/v1/tasks?hour=23
+#delete when --> query
+DELETE http://localhost:4000/api/v1/tasks?hour=10

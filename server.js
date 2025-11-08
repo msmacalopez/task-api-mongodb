@@ -1,8 +1,9 @@
 import express from "express";
 import fs from "fs";
-
+import cors from "cors";
 import mongoose from "mongoose";
-//make connection string to db (is doesn't exit, it creates)
+
+//make "connection string"(: protocol:server:port:db we're connected) to db (if doesn't exit, it creates)
 mongoose.connect("mongodb://localhost:27017/ntdl-july-db").then(() => {
   console.log("Connected");
   // app.listen(PORT, (error) => {
@@ -19,12 +20,12 @@ const PORT = 4000;
 
 //Task Schema
 const taskSchema = new mongoose.Schema({
-  task: String,
-  hour: Number,
+  task: { required: true, type: String }, //task: String
+  hour: { type: Number, default: 100 },
   type: String,
 });
 
-//Task Model: create collection Task with taskSchema
+//Task Model: create collection Task with taskSchema(schema: properties and datatypes)
 const Task = mongoose.model("Task", taskSchema);
 
 const getUniqueId = () => {
@@ -45,6 +46,8 @@ const getUniqueId = () => {
 //use middleware to get the body
 //always require, populates the request.body
 app.use(express.json());
+//allowing cors
+app.use(cors());
 
 //Get request in baseurl
 app.get("/", (req, res) => {
@@ -54,14 +57,13 @@ app.get("/", (req, res) => {
 //create endpoint=/api/v1/task
 //{{id,task,hour,type}}
 
-//CREATE
+//CREATE TASK api
 app.post("/api/v1/tasks", async (req, res) => {
   //get the data
   let taskObj = req.body;
 
   const newTask = new Task(taskObj);
-
-  await newTask.save(); //Or await Task.insertOne(taskObj);
+  await newTask.save(); //Or const newTask = await Task.insertOne(taskObj);
 
   //read taskData
   //   let taskData = JSON.parse(fs.readFileSync("data/tasks.json")) || [];
@@ -74,18 +76,19 @@ app.post("/api/v1/tasks", async (req, res) => {
 
   res.status(201).send({
     status: "success",
-    message: "resuqested",
+    message: "Task saved in DB",
   });
 });
 
-//read resource (all)
+//read resource TASK (all)
 app.get("/api/v1/tasks", async (req, res) => {
   let query = {};
+
   if (req.query?.type) {
     query.type = req.query.type;
   }
 
-  let tasks = await Task.find();
+  let tasks = await Task.find(); //with query: let tasks = await Task.find(query);
 
   res.status(200).send({
     status: "success",
@@ -94,7 +97,7 @@ app.get("/api/v1/tasks", async (req, res) => {
   });
 });
 
-//read specific task (findOne) witn id
+//read specific task (findOne) with id
 app.get("/api/v1/tasks/:id", async (req, res) => {
   let taskId = req.params.id;
 
@@ -134,13 +137,13 @@ app.patch("/api/v1/tasks/:id", async (req, res) => {
 
     let updatedProp = req.body;
 
-    //finde the tas with id (type? hour? task?)
+    //find the task with id (type? hour? task?)
     let task = await Task.findByIdAndUpdate(id, updatedProp, { new: true });
 
     //or, if any diff than ID
     task = await Task.findOneAndUpdate({ _id: id }, updatedProp, { new: true });
 
-    //return respondse
+    //return response
     res.send({
       status: "success",
       message: "Task updated",
@@ -182,7 +185,19 @@ app.delete("/api/v1/tasks", async (req, res) => {
   });
 });
 
-//put this ath the end:
+// //delete all tasks (dangerous)
+// app.delete("/api/v1/tasks", async (req, res) => {
+//   let tasks = await Task.deleteMany({});
+
+//   //return response
+//   res.send({
+//     status: "success",
+//     message: "all Task deleted",
+//     tasks,
+//   });
+// });
+
+//put this at the end:
 app.listen(PORT, (error) => {
   if (error) {
     console.log("Error while starting");
